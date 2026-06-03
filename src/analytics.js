@@ -192,6 +192,96 @@ export function tallyDamageOutput(monsters) {
   );
 }
 
+// High-level damage groups. "Physical" = bludgeoning/piercing/slashing,
+// "Elemental" = the classic elemental energies, "Other" = everything else
+// (force, necrotic, poison, psychic, radiant).
+export const DAMAGE_GROUPS = {
+  physical: ['bludgeoning', 'piercing', 'slashing'],
+  elemental: ['acid', 'cold', 'fire', 'lightning', 'thunder'],
+};
+
+const GROUP_LABELS = {
+  physical: 'Physical (B/P/S)',
+  elemental: 'Elemental',
+  other: 'Other',
+};
+
+export function damageGroupOf(type) {
+  const t = (type || '').toLowerCase();
+  if (DAMAGE_GROUPS.physical.includes(t)) return 'physical';
+  if (DAMAGE_GROUPS.elemental.includes(t)) return 'elemental';
+  return 'other';
+}
+
+// Aggregate damage output collapsed into physical / elemental / other groups.
+// A monster can contribute to several groups (e.g. a claw + fire breath).
+export function tallyDamageGroups(monsters) {
+  const order = ['physical', 'elemental', 'other'];
+  const map = new Map(
+    order.map((g) => [g, {
+      key: GROUP_LABELS[g], group: g, unique: 0, weighted: 0, instances: 0, totalAvg: 0, monsters: [],
+    }]),
+  );
+  for (const m of monsters) {
+    const instances = Array.isArray(m.damageInstances) ? m.damageInstances : [];
+    if (!instances.length) continue;
+    const perGroup = new Map();
+    for (const inst of instances) {
+      const g = damageGroupOf(inst.type);
+      const cur = perGroup.get(g) || { avg: 0, count: 0 };
+      cur.avg += Number(inst.avg) || 0;
+      cur.count += 1;
+      perGroup.set(g, cur);
+    }
+    const weight = m.count || 1;
+    for (const [g, agg] of perGroup) {
+      const entry = map.get(g);
+      entry.unique += 1;
+      entry.weighted += weight;
+      entry.instances += agg.count;
+      entry.totalAvg += agg.avg * weight;
+      entry.monsters.push({ name: m.name, href: m.href, count: weight, avg: agg.avg, instances: agg.count });
+    }
+  }
+  for (const e of map.values()) {
+    e.monsters.sort((a, b) => b.avg * b.count - a.avg * a.count || a.name.localeCompare(b.name));
+  }
+  return order.map((g) => map.get(g)).filter((e) => e.instances > 0);
+}
+
+// Bucket each monster (with parsed damage) into exactly one profile, comparing
+// physical and elemental presence: pure physical, pure elemental, both, or
+// other/mixed (anything involving "other" types without being both phys+elem).
+export function categorizeDamageProfiles(monsters) {
+  const buckets = [
+    { key: 'Pure physical (B/P/S only)', profile: 'physical', unique: 0, weighted: 0, monsters: [] },
+    { key: 'Pure elemental only', profile: 'elemental', unique: 0, weighted: 0, monsters: [] },
+    { key: 'Physical + elemental', profile: 'both', unique: 0, weighted: 0, monsters: [] },
+    { key: 'Other / mixed', profile: 'other', unique: 0, weighted: 0, monsters: [] },
+  ];
+  for (const m of monsters) {
+    const instances = Array.isArray(m.damageInstances) ? m.damageInstances : [];
+    if (!instances.length) continue;
+    const has = { physical: false, elemental: false, other: false };
+    for (const inst of instances) has[damageGroupOf(inst.type)] = true;
+
+    let idx;
+    if (has.physical && !has.elemental && !has.other) idx = 0;
+    else if (has.elemental && !has.physical && !has.other) idx = 1;
+    else if (has.physical && has.elemental) idx = 2;
+    else idx = 3;
+
+    const b = buckets[idx];
+    b.unique += 1;
+    b.weighted += m.count || 1;
+    b.monsters.push({ name: m.name, href: m.href, count: m.count || 1 });
+  }
+  for (const b of buckets) {
+    b.monsters.sort((a, c) => c.count - a.count || a.name.localeCompare(c.name));
+  }
+  return buckets.filter((b) => b.unique > 0);
+}
+
 function stats(values) {
   if (!values.length) return null;
   const sorted = [...values].sort((a, b) => a - b);
@@ -250,6 +340,8 @@ export function summarize(monsters) {
     conditionImmunities: tallyDamageField(monsters, 'conditionImmunities'),
     damageOutput,
     damageOutputCoverage: { with: damageOutputCoverage, total: monsters.length },
+    damageGroups: tallyDamageGroups(monsters),
+    damageProfiles: categorizeDamageProfiles(monsters),
   };
 }
 

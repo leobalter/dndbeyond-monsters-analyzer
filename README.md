@@ -19,6 +19,7 @@ A Chrome extension that scans any [D&D Beyond](https://www.dndbeyond.com/) page 
   - CR distribution, creature types, sizes
   - Damage resistances / immunities / vulnerabilities / condition immunities, each row expandable to list the contributing monsters
   - Exploratory **Damage output by type** (parsed from action damage rolls)
+  - Exploratory **Physical vs elemental** damage-output comparison (B/P/S vs elemental vs other), plus a **damage type profile** breakdown bucketing each monster as pure physical, pure elemental, both, or other/mixed
 
 ## Install (unpacked, for development)
 

@@ -112,6 +112,42 @@ function renderDamageOutput(rows, coverage) {
   }).join('');
 }
 
+function renderDamageGroups(rows) {
+  const el = document.getElementById('damage-groups');
+  if (!rows.length) {
+    el.innerHTML = '<div class="muted">No damage rolls extracted.</div>';
+    return;
+  }
+  const max = rows.reduce((m, r) => Math.max(m, r.totalAvg), 0) || 1;
+  el.innerHTML = rows.map((r) => {
+    const pct = Math.round((r.totalAvg / max) * 100);
+    return `
+      <details class="row">
+        <summary>
+          <span class="arrow"></span>
+          <div class="label" style="--w:${pct}%"><span class="bar"></span><span class="text">${escapeHtml(r.key)}</span></div>
+          <div class="num">
+            <strong>${Math.round(r.totalAvg)}</strong> avg dmg ·
+            <strong>${r.unique}</strong> monsters · ${r.instances} rolls
+          </div>
+        </summary>
+        <ul class="monsters">${r.monsters.map((m) => `
+          <li>
+            <a href="${escapeHtml(m.href)}" target="_blank" rel="noopener">${escapeHtml(m.name)}</a>
+            <span class="muted">×${m.count} · ${m.avg} avg over ${m.instances} roll${m.instances === 1 ? '' : 's'} = ${m.avg * m.count} weighted</span>
+          </li>
+        `).join('')}</ul>
+      </details>
+    `;
+  }).join('');
+}
+
+function renderDamageProfiles(rows, coverage) {
+  document.getElementById('damage-profiles-coverage').textContent =
+    `Based on ${coverage.with} / ${coverage.total} monsters with parsed action damage.`;
+  renderTally('damage-profiles', rows);
+}
+
 function renderMonstersTable(monsters) {
   document.getElementById('monsters-count').textContent = monsters.length;
   const tbody = document.querySelector('#monsters-table tbody');
@@ -223,6 +259,8 @@ function renderView(view) {
   renderTally('dmg-vulnerabilities', sum.damageVulnerabilities);
   renderTally('cond-immunities', sum.conditionImmunities);
   renderDamageOutput(sum.damageOutput, sum.damageOutputCoverage);
+  renderDamageGroups(sum.damageGroups);
+  renderDamageProfiles(sum.damageProfiles, sum.damageOutputCoverage);
   renderMonstersTable(monsters);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }

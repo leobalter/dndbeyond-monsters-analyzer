@@ -95,6 +95,30 @@
         <div id="damage-output" class="tally"></div>
       </section>
 
+      <section class="grid grid-2">
+        <div class="card">
+          <h2>Physical vs elemental — damage output <span class="exploratory">exploratory</span></h2>
+          <p class="muted">
+            Total parsed average damage collapsed into <strong>Physical</strong>
+            (bludgeoning / piercing / slashing), <strong>Elemental</strong>
+            (acid / cold / fire / lightning / thunder), and <strong>Other</strong>
+            (force / necrotic / poison / psychic / radiant). A monster can
+            contribute to more than one group. Expand a bar to see contributors.
+          </p>
+          <div id="damage-groups" class="tally"></div>
+        </div>
+        <div class="card">
+          <h2>Damage type profiles <span class="exploratory">exploratory</span></h2>
+          <p class="muted">
+            Each monster with parsed damage, bucketed <em>once</em>: pure physical,
+            pure elemental, both physical and elemental, or other/mixed. Use it to
+            see how much of the table leans on physical vs elemental damage.
+          </p>
+          <p class="muted" id="damage-profiles-coverage"></p>
+          <div id="damage-profiles" class="tally"></div>
+        </div>
+      </section>
+
       <section class="card">
         <h2>Monsters</h2>
         <p class="muted">Backing data: <span id="monsters-count"></span> unique entries used for these stats.</p>
