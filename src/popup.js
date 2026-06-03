@@ -4,7 +4,8 @@
 
 import { scanMonsterTooltips } from './scanner.js';
 import { parseMonsterHtml } from './parser.js';
-import { getCached, setCached, clearCache, cacheSize } from './storage.js';
+import { getCached, setCached, clearCache, cacheSize, saveScan, getScanForUrl } from './storage.js';
+import { suggestCampaign } from './analytics.js';
 
 const FETCH_CONCURRENCY = 2;
 
@@ -15,12 +16,26 @@ const scanBtn = document.getElementById('scan');
 const statsBtn = document.getElementById('stats');
 const copyBtn = document.getElementById('copy');
 const clearBtn = document.getElementById('clear');
+const campaignEl = document.getElementById('campaign');
 
 let lastResults = [];
 
 cacheSize().then((n) => {
   if (n > 0) setStatus(`${n} monster${n === 1 ? '' : 's'} in cache. Open a D&D Beyond page and click "Scan page".`);
 });
+
+// Pre-fill the campaign field: reuse a saved campaign for this page if one
+// exists, otherwise suggest one parsed from the URL.
+(async () => {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab?.url) return;
+    const existing = await getScanForUrl(tab.url);
+    campaignEl.value = existing?.campaign || suggestCampaign(tab.url);
+  } catch {
+    /* non-fatal */
+  }
+})();
 
 scanBtn.addEventListener('click', () => {
   run().catch((err) => setStatus(err.message || String(err), true));
@@ -132,6 +147,14 @@ async function runPool(items, limit, worker) {
   await Promise.all(runners);
 }
 
+// Persist the scan both as the "current" snapshot (for the default Stats view)
+// and into the campaign-grouped history.
+async function persistScan(monsters, tab) {
+  const snapshot = { monsters, tabUrl: tab.url, timestamp: Date.now() };
+  await chrome.storage.local.set({ lastScan: snapshot });
+  await saveScan({ ...snapshot, campaign: campaignEl.value });
+}
+
 async function run() {
   scanBtn.disabled = true;
   copyBtn.disabled = true;
@@ -193,9 +216,7 @@ async function run() {
     lastResults = monsters;
     copyBtn.disabled = false;
     scanBtn.disabled = false;
-    await chrome.storage.local.set({
-      lastScan: { monsters, tabUrl: tab.url, timestamp: Date.now() },
-    });
+    await persistScan(monsters, tab);
     setStatus(`Done. ${monsters.length} unique monster${monsters.length === 1 ? '' : 's'} (all from cache).`);
     return;
   }
@@ -227,9 +248,7 @@ async function run() {
   copyBtn.disabled = false;
   scanBtn.disabled = false;
 
-  await chrome.storage.local.set({
-    lastScan: { monsters, tabUrl: tab.url, timestamp: Date.now() },
-  });
+  await persistScan(monsters, tab);
 
   const failed = monsters.filter((m) => m.error).length;
   const cachedSuffix = cachedCount ? ` (${cachedCount} from cache)` : '';

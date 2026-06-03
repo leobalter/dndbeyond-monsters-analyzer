@@ -252,3 +252,74 @@ export function summarize(monsters) {
     damageOutputCoverage: { with: damageOutputCoverage, total: monsters.length },
   };
 }
+
+// Canonical form of a monster/page URL (origin + pathname), so the same
+// resource with different query strings or fragments is treated as one.
+export function canonicalUrl(url) {
+  try {
+    const u = new URL(url);
+    return u.origin + u.pathname;
+  } catch {
+    return url || '';
+  }
+}
+
+// Suggest a campaign label by parsing a D&D Beyond page URL. Returns '' when
+// nothing recognizable is found, in which case the user can type their own.
+export function suggestCampaign(tabUrl) {
+  if (!tabUrl) return '';
+  let u;
+  try {
+    u = new URL(tabUrl);
+  } catch {
+    return '';
+  }
+  const parts = u.pathname.split('/').filter(Boolean);
+  const after = (name) => {
+    const i = parts.indexOf(name);
+    return i >= 0 ? parts[i + 1] : undefined;
+  };
+  const titleize = (slug) =>
+    String(slug)
+      .replace(/[-_]+/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase())
+      .trim();
+
+  const campaign = after('campaigns');
+  if (campaign) return `Campaign ${campaign}`;
+  const encounter = after('encounters');
+  if (encounter) return `Encounter ${encounter}`;
+
+  // Sources can be /sources/<book>/... or the newer /sources/dnd/<book>/...
+  let source = after('sources');
+  if (source === 'dnd') {
+    const i = parts.indexOf('sources');
+    if (parts[i + 2]) source = parts[i + 2];
+  }
+  if (source) return titleize(source);
+
+  return '';
+}
+
+// Merge several monster lists into one, combining duplicates by canonical URL
+// and summing their per-page counts. Missing stat fields are backfilled from
+// whichever copy has them.
+export function mergeMonsters(lists) {
+  const map = new Map();
+  for (const monsters of lists) {
+    for (const m of monsters || []) {
+      const key = canonicalUrl(m.href);
+      const existing = map.get(key);
+      if (existing) {
+        existing.count = (existing.count || 1) + (m.count || 1);
+        for (const [k, v] of Object.entries(m)) {
+          if (k === 'count') continue;
+          if (existing[k] == null || existing[k] === '') existing[k] = v;
+        }
+      } else {
+        map.set(key, { ...m, count: m.count || 1 });
+      }
+    }
+  }
+  return Array.from(map.values());
+}

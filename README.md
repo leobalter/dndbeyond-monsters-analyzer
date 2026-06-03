@@ -9,8 +9,11 @@ A Chrome extension that scans any [D&D Beyond](https://www.dndbeyond.com/) page 
 - Per-page monster scan with occurrence counts
 - Stat-block fields surfaced per monster: CR, size/type/alignment, HP, AC, damage resistances/immunities/vulnerabilities, condition immunities
 - Local cache (`chrome.storage.local`) so re-scans reuse what has already been fetched; **Clear cache** when you want a fresh crawl
+- **Saved scan history** with timestamps, grouped by **campaign** (auto-suggested from the page URL, fully editable)
 - Copy JSON of the current scan for external analysis
 - Full-page **Stats** view with:
+  - **Saved scans** dashboard — every stored scan with its timestamp, grouped by campaign; view a single scan or **merge a whole campaign** into one aggregate
+  - **Download JSON** / **Copy JSON** of whatever you're currently viewing (single scan or merged campaign), including the computed summary
   - Overview (unique monsters, total references on the page)
   - HP / AC / CR — mean, median, min, max (per-unique and weighted by count)
   - CR distribution, creature types, sizes
@@ -28,15 +31,17 @@ A Chrome extension that scans any [D&D Beyond](https://www.dndbeyond.com/) page 
 
 1. Open any D&D Beyond page that references monsters (e.g. an adventure chapter, encounter, or random table).
 2. Click the extension icon.
-3. Click **Scan page**. Rows render immediately with name/count and fill in stat fields as fetches complete (2 in parallel, using your existing D&D Beyond session).
-4. Click **Stats** to open the analysis page in a new tab.
-5. Click **Copy JSON** to copy the structured result.
+3. (Optional) Set or confirm the **Campaign** field — it's auto-suggested from the page URL and used to group saved scans.
+4. Click **Scan page**. Rows render immediately with name/count and fill in stat fields as fetches complete (2 in parallel, using your existing D&D Beyond session). Each scan is saved to local history (re-scanning the same page updates that entry).
+5. Click **Stats** to open the analysis page in a new tab. Use the **Saved scans** dashboard to revisit any stored scan, re-assign its campaign, or **merge a whole campaign** into one aggregate.
+6. Click **Download JSON** / **Copy JSON** on the Stats page to export the current view (single scan or merged campaign) — handy for further analysis with an LLM.
 
 ## Privacy
 
 This extension does not collect, transmit, or share any user data. Everything it reads stays in your browser:
 
 - Scanned monster references and parsed stat-block data are stored in `chrome.storage.local` on your machine and never sent anywhere.
+- Saved scan history (including campaign labels you assign) also stays in `chrome.storage.local` on your machine.
 - Monster pages are fetched directly from `dndbeyond.com` using your existing session cookies — the same way your browser already does when you click a link.
 - No analytics, no tracking, no remote code.
 

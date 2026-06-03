@@ -42,6 +42,35 @@ h1 {
   gap: 6px;
 }
 
+.campaign-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+  flex-wrap: wrap;
+}
+.campaign-row label {
+  color: var(--muted);
+  font-weight: 600;
+}
+.campaign-row input {
+  font: inherit;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  min-width: 220px;
+}
+.campaign-row input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.campaign-hint {
+  font-size: 11px;
+}
+.muted { color: var(--muted); }
+
 button {
   font: inherit;
   padding: 5px 10px;

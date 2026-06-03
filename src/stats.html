@@ -9,13 +9,26 @@
     <header>
       <h1>Monsters Analyzer — Stats</h1>
       <p id="source" class="muted"></p>
+      <div id="export-bar" class="export-bar" hidden>
+        <button type="button" id="download-json" class="btn">Download JSON</button>
+        <button type="button" id="copy-json" class="btn">Copy JSON</button>
+        <span id="export-status" class="muted" role="status" aria-live="polite"></span>
+      </div>
     </header>
 
     <p id="empty" class="muted" hidden>
       No scan data yet. Open a D&amp;D Beyond page, click the extension, and run "Scan page".
     </p>
 
+    <section id="dashboard" class="card" hidden>
+      <h2>Saved scans</h2>
+      <p class="muted">Grouped by campaign. Click a scan to view it, or merge a whole campaign.</p>
+      <p id="dashboard-empty" class="muted" hidden>No saved scans yet.</p>
+      <div id="scan-groups"></div>
+    </section>
+
     <main id="content" hidden>
+      <p id="view-title" class="view-title"></p>
       <section class="overview">
         <h2>Overview</h2>
         <dl id="overview-list"></dl>
