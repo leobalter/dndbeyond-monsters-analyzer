@@ -1,3 +1,7 @@
+// Copyright 2026 Leo Balter
+// SPDX-License-Identifier: Apache-2.0
+// Unofficial tool; not affiliated with Wizards of the Coast or D&D Beyond. See NOTICE.
+//
 // Parses a D&D Beyond monster page (HTML string) into a small structured record.
 // We target the classic stat-block markup but fall back gracefully when a
 // field is missing.

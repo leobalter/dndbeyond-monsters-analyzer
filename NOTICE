@@ -1,0 +1,21 @@
+Monsters Analyzer for D&D Beyond
+Copyright 2026 Leo Balter
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+--------------------------------------------------------------------------------
+Unofficial / Third-Party Content Notice
+--------------------------------------------------------------------------------
+
+This software is an UNOFFICIAL tool. It is not affiliated with, endorsed by, or
+sponsored by Wizards of the Coast or D&D Beyond.
+
+"Dungeons & Dragons", "D&D", "D&D Beyond", and related names, marks, stat blocks,
+and game content are the property of Wizards of the Coast LLC and/or its
+affiliates. This project's Apache-2.0 license covers only this project's own
+source code; it grants no rights in any such third-party content or trademarks.
+
+The software interacts with the D&D Beyond website. Your use of the software is
+also subject to the D&D Beyond / Wizards of the Coast Terms of Service
+(https://www.dndbeyond.com/terms), and you are solely responsible for complying
+with them.

@@ -81,3 +81,21 @@ zip -r monsters-analyzer.zip manifest.json src icons \
 ```
 
 Then upload the resulting `monsters-analyzer.zip` in the [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole), set visibility to **Unlisted**, and submit for review.
+
+> Anyone is free to use, modify, and distribute this extension under the Apache-2.0 license, including publishing their own build. See [License](#license).
+
+## License
+
+This project is licensed under the **[Apache License 2.0](LICENSE)**. Copyright © 2026 Leo Balter.
+
+In short:
+
+- ✅ You may use, modify, and distribute the code — including commercially and including publishing your own build to a store — provided you comply with the license.
+- ✅ Apache-2.0 includes an explicit patent grant and a strong "AS IS" warranty/liability disclaimer, so the author is not on the hook for how you use it.
+- 📎 You must keep the [LICENSE](LICENSE) and [NOTICE](NOTICE) files, retain attribution notices, and state significant changes you make.
+
+### Important: D&D Beyond / Wizards of the Coast content
+
+This is an **unofficial** tool and is **not** affiliated with, endorsed by, or sponsored by Wizards of the Coast or D&D Beyond. "Dungeons & Dragons", "D&D Beyond", and the stat blocks and game content this tool reads are the property of Wizards of the Coast and are **not** covered by this project's license.
+
+The Apache-2.0 license covers *this project's own code* — it cannot and does not grant any rights to D&D Beyond's content. Your use of this tool is also governed by the **[D&D Beyond / Wizards of the Coast Terms of Service](https://www.dndbeyond.com/terms)**, and you are responsible for complying with them. See [NOTICE](NOTICE) for the full attribution and disclaimer.

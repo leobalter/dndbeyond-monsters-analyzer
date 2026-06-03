@@ -1,3 +1,7 @@
+// Copyright 2026 Leo Balter
+// SPDX-License-Identifier: Apache-2.0
+// Unofficial tool; not affiliated with Wizards of the Coast or D&D Beyond. See NOTICE.
+//
 // Pure functions for turning a list of parsed monster records into aggregate
 // statistics. Each monster has a `count` (how many times it appeared on the
 // scanned page) so tallies are produced two ways:

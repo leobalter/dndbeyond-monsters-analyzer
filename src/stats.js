@@ -1,3 +1,7 @@
+// Copyright 2026 Leo Balter
+// SPDX-License-Identifier: Apache-2.0
+// Unofficial tool; not affiliated with Wizards of the Coast or D&D Beyond. See NOTICE.
+
 import { summarize, parseChallenge, formatChallenge, parseHitPoints, parseArmorClass, parseMeta } from './analytics.js';
 
 const emptyEl = document.getElementById('empty');

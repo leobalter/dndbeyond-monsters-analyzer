@@ -1,3 +1,7 @@
+// Copyright 2026 Leo Balter
+// SPDX-License-Identifier: Apache-2.0
+// Unofficial tool; not affiliated with Wizards of the Coast or D&D Beyond. See NOTICE.
+
 import { scanMonsterTooltips } from './scanner.js';
 import { parseMonsterHtml } from './parser.js';
 import { getCached, setCached, clearCache, cacheSize } from './storage.js';

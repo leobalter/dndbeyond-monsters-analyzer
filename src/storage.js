@@ -1,3 +1,7 @@
+// Copyright 2026 Leo Balter
+// SPDX-License-Identifier: Apache-2.0
+// Unofficial tool; not affiliated with Wizards of the Coast or D&D Beyond. See NOTICE.
+//
 // Per-monster cache backed by chrome.storage.local.
 // Keyed by canonical URL (origin + pathname) so query strings or fragments
 // on the same monster don't fragment the cache.
