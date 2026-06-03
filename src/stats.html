@@ -120,6 +120,36 @@
       </section>
 
       <section class="card">
+        <h2>Party recommendations <span class="exploratory">exploratory</span></h2>
+        <p class="muted">
+          PC-vs-monster guidance derived from this set. Offense ranks each damage
+          type by <strong>2&times;vulnerable &minus; resistant &minus; 2&times;immune</strong>
+          (weighted by page references) &mdash; how well your party's damage lands.
+          Defense ranks the damage types these monsters actually <em>deal</em>, so
+          you can pick resistances that matter.
+        </p>
+        <p class="muted" id="recommend-coverage"></p>
+        <div class="grid grid-2">
+          <div>
+            <h3>Best damage types to use <span class="exploratory">PCs succeed better</span></h3>
+            <div id="recommend-use" class="tally"></div>
+          </div>
+          <div>
+            <h3>Damage types to avoid <span class="exploratory">resisted / immune</span></h3>
+            <div id="recommend-avoid" class="tally"></div>
+          </div>
+          <div>
+            <h3>Top recommended resistances <span class="exploratory">most damage taken</span></h3>
+            <div id="recommend-resist" class="tally"></div>
+          </div>
+          <div>
+            <h3>Least needed resistances <span class="exploratory">rarely / never dealt</span></h3>
+            <div id="recommend-skip" class="tally"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
         <h2>Monsters</h2>
         <p class="muted">Backing data: <span id="monsters-count"></span> unique entries used for these stats.</p>
         <details>

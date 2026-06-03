@@ -282,6 +282,103 @@ export function categorizeDamageProfiles(monsters) {
   return buckets.filter((b) => b.unique > 0);
 }
 
+// The 13 standard 5e damage types, used to score every type even when no
+// monster in the set interacts with it (so "least needed" can be reported).
+export const ALL_DAMAGE_TYPES = [
+  'bludgeoning', 'piercing', 'slashing',
+  'acid', 'cold', 'fire', 'lightning', 'thunder',
+  'force', 'necrotic', 'poison', 'psychic', 'radiant',
+];
+
+function cap(t) {
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
+// Which standard damage types appear anywhere in a defense string. Handles
+// compound entries like "bludgeoning, piercing, and slashing from nonmagical
+// attacks" by scanning for each keyword.
+function typesInText(str) {
+  if (!str) return [];
+  const lower = str.toLowerCase();
+  return ALL_DAMAGE_TYPES.filter((t) => lower.includes(t));
+}
+
+// Player-character recommendations derived from the monster set.
+//
+// Offense — for each damage type, count how many monsters (weighted by page
+// references) are Vulnerable / Resistant / Immune to it, then score it:
+//   score = 2*vulnerable - 1*resistant - 2*immune   (per weighted reference)
+// High score => great type for PCs to deal; low score => a type to avoid.
+//
+// Defense — reuse parsed action damage output: the damage types monsters
+// actually deal the most are the resistances PCs benefit from most; the types
+// they rarely/never deal are the least needed.
+export function recommendations(monsters) {
+  const ref = (m) => ({ name: m.name, href: m.href, count: m.count || 1 });
+
+  const off = new Map(ALL_DAMAGE_TYPES.map((t) => [t, {
+    key: cap(t),
+    type: t,
+    vulnerable: { unique: 0, weighted: 0, monsters: [] },
+    resistant: { unique: 0, weighted: 0, monsters: [] },
+    immune: { unique: 0, weighted: 0, monsters: [] },
+    score: 0,
+  }]));
+
+  let defended = 0;
+  for (const m of monsters) {
+    const w = m.count || 1;
+    const vuln = new Set(typesInText(m.damageVulnerabilities));
+    const res = new Set(typesInText(m.damageResistances));
+    const imm = new Set(typesInText(m.damageImmunities));
+    if (vuln.size || res.size || imm.size) defended += 1;
+    for (const t of ALL_DAMAGE_TYPES) {
+      const e = off.get(t);
+      if (vuln.has(t)) {
+        e.vulnerable.unique += 1; e.vulnerable.weighted += w; e.vulnerable.monsters.push(ref(m));
+      }
+      // A monster is never both resistant and immune to the same type; immunity wins.
+      if (imm.has(t)) {
+        e.immune.unique += 1; e.immune.weighted += w; e.immune.monsters.push(ref(m));
+      } else if (res.has(t)) {
+        e.resistant.unique += 1; e.resistant.weighted += w; e.resistant.monsters.push(ref(m));
+      }
+    }
+  }
+  for (const e of off.values()) {
+    e.score = 2 * e.vulnerable.weighted - e.resistant.weighted - 2 * e.immune.weighted;
+    for (const k of ['vulnerable', 'resistant', 'immune']) {
+      e[k].monsters.sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+    }
+  }
+  const offense = Array.from(off.values()).sort(
+    (a, b) => b.score - a.score || a.key.localeCompare(b.key),
+  );
+
+  // Defense: per-type damage the party will be taking, covering all 13 types.
+  const output = new Map(tallyDamageOutput(monsters).map((e) => [e.key.toLowerCase(), e]));
+  const defense = ALL_DAMAGE_TYPES.map((t) => {
+    const e = output.get(t);
+    return e
+      ? { key: e.key, type: t, unique: e.unique, totalAvg: e.totalAvg, weighted: e.weighted, instances: e.instances, monsters: e.monsters }
+      : { key: cap(t), type: t, unique: 0, totalAvg: 0, weighted: 0, instances: 0, monsters: [] };
+  }).sort((a, b) => b.totalAvg - a.totalAvg || b.weighted - a.weighted || a.key.localeCompare(b.key));
+
+  const damageOutputCount = monsters.filter(
+    (m) => Array.isArray(m.damageInstances) && m.damageInstances.length,
+  ).length;
+
+  return {
+    offense,
+    defense,
+    coverage: {
+      defenses: defended,
+      output: damageOutputCount,
+      total: monsters.length,
+    },
+  };
+}
+
 function stats(values) {
   if (!values.length) return null;
   const sorted = [...values].sort((a, b) => a - b);
@@ -342,6 +439,7 @@ export function summarize(monsters) {
     damageOutputCoverage: { with: damageOutputCoverage, total: monsters.length },
     damageGroups: tallyDamageGroups(monsters),
     damageProfiles: categorizeDamageProfiles(monsters),
+    recommendations: recommendations(monsters),
   };
 }
 

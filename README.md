@@ -20,6 +20,7 @@ A Chrome extension that scans any [D&D Beyond](https://www.dndbeyond.com/) page 
   - Damage resistances / immunities / vulnerabilities / condition immunities, each row expandable to list the contributing monsters
   - Exploratory **Damage output by type** (parsed from action damage rolls)
   - Exploratory **Physical vs elemental** damage-output comparison (B/P/S vs elemental vs other), plus a **damage type profile** breakdown bucketing each monster as pure physical, pure elemental, both, or other/mixed
+  - Exploratory **Party recommendations** — PC-vs-monster guidance: best damage types to use (scored from monster vulnerabilities/resistances/immunities), damage types to avoid, top recommended resistances (the damage these monsters deal most), and least needed resistances (types rarely/never dealt)
 
 ## Install (unpacked, for development)
 

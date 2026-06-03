@@ -148,6 +148,93 @@ function renderDamageProfiles(rows, coverage) {
   renderTally('damage-profiles', rows);
 }
 
+function renderRecommendations(rec) {
+  document.getElementById('recommend-coverage').textContent =
+    `Offense from ${rec.coverage.defenses} / ${rec.coverage.total} monsters that list resistances/immunities/vulnerabilities · `
+    + `defense from ${rec.coverage.output} / ${rec.coverage.total} with parsed action damage.`;
+
+  const use = rec.offense.filter((o) => o.score > 0);
+  const avoid = rec.offense.filter((o) => o.score < 0).sort((a, b) => a.score - b.score);
+  renderOffense('recommend-use', use, 'use');
+  renderOffense('recommend-avoid', avoid, 'avoid');
+
+  const taken = rec.defense.filter((d) => d.totalAvg > 0);
+  const skip = rec.defense.filter((d) => d.totalAvg === 0);
+  renderResist('recommend-resist', taken, 'resist');
+  renderResist('recommend-skip', skip, 'skip');
+}
+
+function renderOffense(elId, rows, kind) {
+  const el = document.getElementById(elId);
+  if (!rows.length) {
+    el.innerHTML = `<div class="muted">${kind === 'use'
+      ? 'No clearly favorable types — no exploitable vulnerabilities in this set.'
+      : 'No commonly resisted or immune damage types in this set.'}</div>`;
+    return;
+  }
+  const max = rows.reduce((m, r) => Math.max(m, Math.abs(r.score)), 0) || 1;
+  el.innerHTML = rows.map((r) => {
+    const pct = Math.round((Math.abs(r.score) / max) * 100);
+    const parts = [];
+    if (r.vulnerable.weighted) parts.push(`${r.vulnerable.weighted} vuln`);
+    if (r.resistant.weighted) parts.push(`${r.resistant.weighted} resist`);
+    if (r.immune.weighted) parts.push(`${r.immune.weighted} immune`);
+    const detail = parts.join(' · ') || 'no interactions';
+    const monsters = [
+      ...r.vulnerable.monsters.map((m) => ({ ...m, tag: 'vulnerable' })),
+      ...r.immune.monsters.map((m) => ({ ...m, tag: 'immune' })),
+      ...r.resistant.monsters.map((m) => ({ ...m, tag: 'resistant' })),
+    ];
+    return `
+      <details class="row">
+        <summary>
+          <span class="arrow"></span>
+          <div class="label" style="--w:${pct}%"><span class="bar"></span><span class="text">${escapeHtml(r.key)}</span></div>
+          <div class="num"><strong>${r.score > 0 ? '+' : ''}${r.score}</strong> · ${detail}</div>
+        </summary>
+        ${monsters.length ? `<ul class="monsters">${monsters.map((m) => `
+          <li>
+            <a href="${escapeHtml(m.href)}" target="_blank" rel="noopener">${escapeHtml(m.name)}</a>
+            <span class="muted">×${m.count} · ${m.tag}</span>
+          </li>
+        `).join('')}</ul>` : '<div class="monsters-empty muted">No contributing monsters.</div>'}
+      </details>
+    `;
+  }).join('');
+}
+
+function renderResist(elId, rows, kind) {
+  const el = document.getElementById(elId);
+  if (!rows.length) {
+    el.innerHTML = `<div class="muted">${kind === 'skip'
+      ? 'Every standard damage type shows up in this set.'
+      : 'No parsed action damage to rank.'}</div>`;
+    return;
+  }
+  const max = rows.reduce((m, r) => Math.max(m, r.totalAvg), 0) || 1;
+  el.innerHTML = rows.map((r) => {
+    const pct = r.totalAvg > 0 ? Math.round((r.totalAvg / max) * 100) : 0;
+    const detail = r.totalAvg > 0
+      ? `<strong>${Math.round(r.totalAvg)}</strong> avg dmg · ${r.unique} monsters · ${r.instances} rolls`
+      : 'never dealt in this set';
+    return `
+      <details class="row"${r.totalAvg > 0 ? '' : ' open'}>
+        <summary>
+          <span class="arrow"></span>
+          <div class="label" style="--w:${pct}%"><span class="bar"></span><span class="text">${escapeHtml(r.key)}</span></div>
+          <div class="num">${detail}</div>
+        </summary>
+        ${r.monsters.length ? `<ul class="monsters">${r.monsters.map((m) => `
+          <li>
+            <a href="${escapeHtml(m.href)}" target="_blank" rel="noopener">${escapeHtml(m.name)}</a>
+            <span class="muted">×${m.count} · ${m.avg} avg over ${m.instances} roll${m.instances === 1 ? '' : 's'}</span>
+          </li>
+        `).join('')}</ul>` : '<div class="monsters-empty muted">No contributing monsters.</div>'}
+      </details>
+    `;
+  }).join('');
+}
+
 function renderMonstersTable(monsters) {
   document.getElementById('monsters-count').textContent = monsters.length;
   const tbody = document.querySelector('#monsters-table tbody');
@@ -261,6 +348,7 @@ function renderView(view) {
   renderDamageOutput(sum.damageOutput, sum.damageOutputCoverage);
   renderDamageGroups(sum.damageGroups);
   renderDamageProfiles(sum.damageProfiles, sum.damageOutputCoverage);
+  renderRecommendations(sum.recommendations);
   renderMonstersTable(monsters);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
