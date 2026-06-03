@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Monsters Analyzer for D&D Beyond — Stats</title>
+    <link rel="stylesheet" href="stats.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Monsters Analyzer — Stats</h1>
+      <p id="source" class="muted"></p>
+    </header>
+
+    <p id="empty" class="muted" hidden>
+      No scan data yet. Open a D&amp;D Beyond page, click the extension, and run "Scan page".
+    </p>
+
+    <main id="content" hidden>
+      <section class="overview">
+        <h2>Overview</h2>
+        <dl id="overview-list"></dl>
+      </section>
+
+      <section class="grid">
+        <div class="card">
+          <h2>Hit Points</h2>
+          <div id="hp" class="numeric"></div>
+        </div>
+        <div class="card">
+          <h2>Armor Class</h2>
+          <div id="ac" class="numeric"></div>
+        </div>
+        <div class="card">
+          <h2>Challenge Rating</h2>
+          <div id="cr" class="numeric"></div>
+        </div>
+      </section>
+
+      <section class="grid">
+        <div class="card">
+          <h2>CR distribution</h2>
+          <div id="cr-dist" class="tally"></div>
+        </div>
+        <div class="card">
+          <h2>Creature types</h2>
+          <div id="types" class="tally"></div>
+        </div>
+        <div class="card">
+          <h2>Sizes</h2>
+          <div id="sizes" class="tally"></div>
+        </div>
+      </section>
+
+      <section class="grid grid-2">
+        <div class="card">
+          <h2>Damage immunities</h2>
+          <div id="dmg-immunities" class="tally"></div>
+        </div>
+        <div class="card">
+          <h2>Damage resistances</h2>
+          <div id="dmg-resistances" class="tally"></div>
+        </div>
+        <div class="card">
+          <h2>Damage vulnerabilities</h2>
+          <div id="dmg-vulnerabilities" class="tally"></div>
+        </div>
+        <div class="card">
+          <h2>Condition immunities</h2>
+          <div id="cond-immunities" class="tally"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Damage output by type <span class="exploratory">exploratory</span></h2>
+        <p class="muted">
+          Parsed from action / trait damage rolls of the form <code>N (XdY + Z) &lt;type&gt; damage</code>.
+          Does <em>not</em> account for multiattack, recharge, breath weapons with saves,
+          conditional riders, or once-per-day abilities — treat as a directional ranking,
+          not a precise budget. Use it to spot which damage types are worth resisting.
+        </p>
+        <p class="muted" id="damage-output-coverage"></p>
+        <div id="damage-output" class="tally"></div>
+      </section>
+
+      <section class="card">
+        <h2>Monsters</h2>
+        <p class="muted">Backing data: <span id="monsters-count"></span> unique entries used for these stats.</p>
+        <details>
+          <summary>Show list</summary>
+          <table id="monsters-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Monster</th>
+                <th>CR</th>
+                <th>HP</th>
+                <th>AC</th>
+                <th>Type</th>
+                <th>Size</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </details>
+      </section>
+    </main>
+
+    <footer class="disclaimer">
+      Unofficial. Not affiliated with, endorsed by, or sponsored by Wizards of the Coast or D&amp;D Beyond.
+    </footer>
+
+    <script src="stats.js" type="module"></script>
+  </body>
+</html>

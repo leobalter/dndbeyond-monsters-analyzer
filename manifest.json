@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Monsters Analyzer for D&D Beyond",
+  "version": "0.2.0",
+  "description": "Unofficial. Scan a D&D Beyond page for referenced monsters, count occurrences, and analyze CR, type, damage resistances, immunities, vulnerabilities, condition immunities, and parsed damage output.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": ["*://*.dndbeyond.com/*"],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Analyze monsters on this page",
+    "default_popup": "src/popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  }
+}

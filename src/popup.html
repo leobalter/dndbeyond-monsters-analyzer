@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Monsters Analyzer for D&D Beyond</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Monsters Analyzer</h1>
+      <div class="actions">
+        <button id="scan" type="button">Scan page</button>
+        <button id="stats" type="button">Stats</button>
+        <button id="copy" type="button" disabled>Copy JSON</button>
+        <button id="clear" type="button">Clear cache</button>
+      </div>
+    </header>
+
+    <p id="status" class="status">Open a D&amp;D Beyond page and click "Scan page".</p>
+
+    <div class="table-wrap">
+      <table id="results" hidden>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Monster</th>
+            <th>CR</th>
+            <th>Type</th>
+            <th>Resistances</th>
+            <th>Immunities</th>
+            <th>Vulnerabilities</th>
+            <th>Condition Imm.</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <footer class="disclaimer">
+      Unofficial. Not affiliated with, endorsed by, or sponsored by Wizards of the Coast or D&amp;D Beyond.
+    </footer>
+
+    <script src="popup.js" type="module"></script>
+  </body>
+</html>
